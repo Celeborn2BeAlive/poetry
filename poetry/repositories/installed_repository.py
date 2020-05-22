@@ -59,8 +59,16 @@ class InstalledRepository(Repository):
                             "{}.pth".format(package.pretty_name)
                         ).open() as f:
                             directory = Path(f.readline().strip())
-                            package.source_type = "directory"
-                            package.source_url = directory.as_posix()
+                            is_directory = True
+
+                            try:
+                                is_directory = directory.exists()
+                            except OSError:
+                                is_directory = False
+
+                            if is_directory:
+                                package.source_type = "directory"
+                                package.source_url = directory.as_posix()
 
                     continue
 
