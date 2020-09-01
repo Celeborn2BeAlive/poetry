@@ -1,0 +1,24 @@
+image: python:3
+stages:
+  - test_build
+
+tests:
+  stage: test_build
+  script:
+    python -m pip install poetry
+    poetry install -vvv
+    poetry run pytest tests/ --cov --cov-report xml --junitxml test_report.xml
+  artifacts:
+    reports:
+      junit: test_report.xml
+      cobertura: coverage.xml
+  coverage: '/Total coverage: \d+\.\d+/'
+
+build:
+  stage: test_build
+  script:
+    python -m pip install poetry
+    poetry build -f wheel
+  artifacts:
+    paths:
+      - dist
