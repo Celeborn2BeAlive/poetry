@@ -5,6 +5,7 @@ stages:
 tests:
   stage: test_build
   script:
+    - echo $http_proxy
     - python -m pip install poetry
     - poetry install -vvv
     - poetry run pytest tests/ --cov --cov-report xml --junitxml test_report.xml
