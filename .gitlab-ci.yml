@@ -5,9 +5,9 @@ stages:
 tests:
   stage: test_build
   script:
-    python -m pip install poetry
-    poetry install -vvv
-    poetry run pytest tests/ --cov --cov-report xml --junitxml test_report.xml
+    - python -m pip install poetry
+    - poetry install -vvv
+    - poetry run pytest tests/ --cov --cov-report xml --junitxml test_report.xml
   artifacts:
     reports:
       junit: test_report.xml
@@ -17,8 +17,8 @@ tests:
 build:
   stage: test_build
   script:
-    python -m pip install poetry
-    poetry build -f wheel
+    - python -m pip install poetry
+    - poetry build -f wheel
   artifacts:
     paths:
       - dist
