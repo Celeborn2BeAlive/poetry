@@ -276,6 +276,8 @@ class LegacyRepository(PyPiRepository):
 
         for version in versions:
             package = Package(name, version)
+            package.source_type = "legacy"
+            package.source_reference = self.name
             package.source_url = self._url
 
             if extras is not None:
@@ -308,8 +310,18 @@ class LegacyRepository(PyPiRepository):
             return self._packages[index]
         except ValueError:
             package = super(LegacyRepository, self).package(name, version, extras)
+            package.source_type = "legacy"
             package.source_url = self._url
+            package.source_reference = self.name
+
             return package
+
+    def find_links_for_package(self, package):
+        page = self._get("/{}/".format(package.name.replace(".", "-")))
+        if page is None:
+            return []
+
+        return list(page.links_for_version(package.version))
 
     def _get_release_info(self, name, version):  # type: (str, str) -> dict
         page = self._get("/{}/".format(canonicalize_name(name).replace(".", "-")))

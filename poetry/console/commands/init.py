@@ -32,6 +32,7 @@ class InitCommand(Command):
         option("name", None, "Name of the package.", flag=False),
         option("description", None, "Description of the package.", flag=False),
         option("author", None, "Author name of the package.", flag=False),
+        option("python", None, "Compatible Python versions.", flag=False),
         option(
             "dependency",
             None,
@@ -126,17 +127,19 @@ The <c1>init</c1> command creates a basic <comment>pyproject.toml</> file in the
         question.set_validator(self._validate_license)
         license = self.ask(question)
 
-        current_env = SystemEnv(Path(sys.executable))
-        default_python = "^{}".format(
-            ".".join(str(v) for v in current_env.version_info[:2])
-        )
-        question = self.create_question(
-            "Compatible Python versions [<comment>{}</comment>]: ".format(
-                default_python
-            ),
-            default=default_python,
-        )
-        python = self.ask(question)
+        python = self.option("python")
+        if not python:
+            current_env = SystemEnv(Path(sys.executable))
+            default_python = "^{}".format(
+                ".".join(str(v) for v in current_env.version_info[:2])
+            )
+            question = self.create_question(
+                "Compatible Python versions [<comment>{}</comment>]: ".format(
+                    default_python
+                ),
+                default=default_python,
+            )
+            python = self.ask(question)
 
         self.line("")
 
@@ -146,12 +149,12 @@ The <c1>init</c1> command creates a basic <comment>pyproject.toml</> file in the
         help_message = (
             "You can specify a package in the following forms:\n"
             "  - A single name (<b>requests</b>)\n"
-            "  - A name and a constraint (<b>requests ^2.23.0</b>)\n"
+            "  - A name and a constraint (<b>requests@^2.23.0</b>)\n"
             "  - A git url (<b>git+https://github.com/python-poetry/poetry.git</b>)\n"
             "  - A git url with a revision (<b>git+https://github.com/python-poetry/poetry.git#develop</b>)\n"
             "  - A file path (<b>../my-package/my-package.whl</b>)\n"
             "  - A directory (<b>../my-package/</b>)\n"
-            "  - An url (<b>https://example.com/packages/my-package-0.1.0.tar.gz</b>)\n"
+            "  - A url (<b>https://example.com/packages/my-package-0.1.0.tar.gz</b>)\n"
         )
         help_displayed = False
         if self.confirm(question, True):
